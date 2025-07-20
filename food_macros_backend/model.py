@@ -4,18 +4,22 @@ import io
 import json
 import tensorflow as tf
 
-# Load trained model
-model = tf.keras.models.load_model("/Users/uditbhardwaj/Documents/AndroidProjects/food_macros_app/food_macros_backend/food_classifier_model.h5")
+
+import os
+model_path = os.path.join(os.path.dirname(__file__), "food_classifier_model.h5")
+model = tf.keras.models.load_model(model_path)
 
 # Load class labels
-def load_class_labels(filepath="/Users/uditbhardwaj/Documents/AndroidProjects/food_macros_app/food_macros_backend/class_names.txt"):
-    with open(filepath, "r") as f:
+def load_class_labels():
+    label_path = os.path.join(os.path.dirname(__file__), "class_names.txt")
+    with open(label_path, "r") as f:
         return [line.strip() for line in f.readlines()]
 
-class_labels = load_class_labels("/Users/uditbhardwaj/Documents/AndroidProjects/food_macros_app/food_macros_backend/class_names.txt")
+class_labels = load_class_labels()
 
 # Load nutrition database
-with open("/Users/uditbhardwaj/Documents/AndroidProjects/food_macros_app/food_macros_backend/nutrition_database.json", "r") as f:
+nutrition_db_path = os.path.join(os.path.dirname(__file__), "nutrition_database.json")
+with open(nutrition_db_path, "r") as f:
     nutrition_db = json.load(f)
 
 # Image preprocessing function

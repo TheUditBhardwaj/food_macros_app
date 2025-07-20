@@ -54,4 +54,4 @@ async def upload_image_for_prediction(file: UploadFile = File(...)):
 
 # To run the app (add this block if you want to run directly via python main.py)
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=8080)
