@@ -1,11 +1,24 @@
+// lib/tabs/goals_tab.dart
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart'; // For general Colors and sometimes Icons
+import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '/utils/app_colors.dart';
 
 class GoalsTab extends StatefulWidget {
-  const GoalsTab({super.key});
+  // Add parameters to receive current daily intake from MainTabView
+  final double currentCalories;
+  final double currentProtein;
+  final double currentCarbs;
+  final double currentFat;
+
+  const GoalsTab({
+    super.key,
+    this.currentCalories = 0.0, // Provide defaults
+    this.currentProtein = 0.0,
+    this.currentCarbs = 0.0,
+    this.currentFat = 0.0,
+  });
 
   @override
   State<GoalsTab> createState() => _GoalsTabState();
@@ -18,17 +31,17 @@ class _GoalsTabState extends State<GoalsTab> {
   double _carbsGoal = 200.0;
   double _fatGoal = 70.0;
 
-  // Mock current intake for demonstration (would come from daily history aggregation)
-  double _currentCalories = 1200.0;
-  double _currentProtein = 80.0;
-  double _currentCarbs = 150.0;
-  double _currentFat = 40.0;
+  // The 'current intake' values are now received via widget properties, not internal state
+  // double _currentCalories = 1200.0; // REMOVE or COMMENT OUT THIS LINE
+  // double _currentProtein = 80.0;    // REMOVE or COMMENT OUT THIS LINE
+  // double _currentCarbs = 150.0;     // REMOVE or COMMENT OUT THIS LINE
+  // double _currentFat = 40.0;        // REMOVE or COMMENT OUT THIS LINE
 
   @override
   void initState() {
     super.initState();
-    _loadGoals();
-    _loadCurrentIntake(); // Load mock current intake too
+    _loadGoals(); // Only load goals, current intake comes from parent
+    // _loadCurrentIntake(); // REMOVE or COMMENT OUT THIS LINE, as it's no longer needed
   }
 
   Future<void> _loadGoals() async {
@@ -49,24 +62,15 @@ class _GoalsTabState extends State<GoalsTab> {
     await prefs.setDouble('fatGoal', _fatGoal);
   }
 
-  // Mock loading for current intake (replace with real aggregation from history)
-  Future<void> _loadCurrentIntake() async {
-    // In a real app, this would query your AnalysisResult history for today's date
-    // and sum up the macros. For now, it's static.
-    await Future.delayed(const Duration(milliseconds: 100)); // Simulate async load
-    setState(() {
-      // These values would dynamically update based on scanned foods for the current day
-      _currentCalories = 1200.0;
-      _currentProtein = 80.0;
-      _currentCarbs = 150.0;
-      _currentFat = 40.0;
-    });
-  }
-
+  // The _loadCurrentIntake method is no longer needed in GoalsTab
+  // Future<void> _loadCurrentIntake() async { /* ... */ } // REMOVE THIS METHOD
 
   @override
   Widget build(BuildContext context) {
     final isDark = CupertinoTheme.of(context).brightness == Brightness.dark;
+
+    final progress = widget.currentCalories / _dailyCaloriesGoal; // Use widget.currentCalories
+    final remaining = _dailyCaloriesGoal - widget.currentCalories; // Use widget.currentCalories
 
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
@@ -79,7 +83,9 @@ class _GoalsTabState extends State<GoalsTab> {
             CupertinoSliverRefreshControl(
               onRefresh: () async {
                 await _loadGoals();
-                await _loadCurrentIntake(); // Refresh current intake as well
+                // We no longer call _loadCurrentIntake here, MainTabView handles aggregation.
+                // You might want to signal MainTabView to re-aggregate if it's not done automatically on data change.
+                // For now, this just ensures goals are reloaded if changed externally.
               },
               builder: (context, refreshState, pulledExtent, refreshTriggerPullDistance, refreshIndicatorExtent) {
                 return Center(
@@ -108,7 +114,7 @@ class _GoalsTabState extends State<GoalsTab> {
                     value: _dailyCaloriesGoal,
                     min: 1000,
                     max: 4000,
-                    divisions: 60, // (4000-1000)/50 = 60
+                    divisions: 60,
                     unit: 'kcal',
                     color: AppColors.systemOrange,
                     onChanged: (newValue) {
@@ -186,7 +192,7 @@ class _GoalsTabState extends State<GoalsTab> {
                       _buildProgressTile(
                         context,
                         label: 'Calories Intake',
-                        currentValue: _currentCalories,
+                        currentValue: widget.currentCalories, // Use widget.currentCalories
                         goalValue: _dailyCaloriesGoal,
                         color: AppColors.systemOrange,
                         icon: CupertinoIcons.flame,
@@ -195,7 +201,7 @@ class _GoalsTabState extends State<GoalsTab> {
                       _buildProgressTile(
                         context,
                         label: 'Protein Intake',
-                        currentValue: _currentProtein,
+                        currentValue: widget.currentProtein, // Use widget.currentProtein
                         goalValue: _proteinGoal,
                         color: AppColors.systemBlue,
                         icon: CupertinoIcons.bolt,
@@ -204,7 +210,7 @@ class _GoalsTabState extends State<GoalsTab> {
                       _buildProgressTile(
                         context,
                         label: 'Carbs Intake',
-                        currentValue: _currentCarbs,
+                        currentValue: widget.currentCarbs, // Use widget.currentCarbs
                         goalValue: _carbsGoal,
                         color: AppColors.systemGreen,
                         icon: CupertinoIcons.leaf_arrow_circlepath,
@@ -213,7 +219,7 @@ class _GoalsTabState extends State<GoalsTab> {
                       _buildProgressTile(
                         context,
                         label: 'Fat Intake',
-                        currentValue: _currentFat,
+                        currentValue: widget.currentFat, // Use widget.currentFat
                         goalValue: _fatGoal,
                         color: AppColors.systemPurple,
                         icon: CupertinoIcons.drop,
@@ -225,7 +231,7 @@ class _GoalsTabState extends State<GoalsTab> {
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20.0),
                     child: Text(
-                      '💡 Tip: Your daily progress will be calculated based on your scanned food items!',
+                      '💡 Tip: Your daily progress updates automatically as you scan food!',
                       style: CupertinoTheme.of(context).textTheme.textStyle.copyWith(
                         color: isDark ? AppColors.darkSecondaryText : AppColors.lightSecondaryText,
                         fontSize: 15,
@@ -243,7 +249,7 @@ class _GoalsTabState extends State<GoalsTab> {
     );
   }
 
-  // Helper widget for a goal setting slider
+  // Helper widget for a goal setting slider (no changes)
   Widget _buildGoalSlider(
       BuildContext context, {
         required String label,
@@ -293,7 +299,7 @@ class _GoalsTabState extends State<GoalsTab> {
     );
   }
 
-  // Helper widget for a single progress tile in the "Today's Progress" section
+  // Helper widget for a single progress tile in the "Today's Progress" section (no changes)
   Widget _buildProgressTile(
       BuildContext context, {
         required String label,
@@ -332,7 +338,7 @@ class _GoalsTabState extends State<GoalsTab> {
       ),
       trailing: SizedBox(
         width: 80, // Adjust width as needed
-        child: CupertinoProgressBar( // This is the new widget
+        child: CupertinoProgressBar(
           value: progress,
           backgroundColor: color.withOpacity(0.2),
           progressColor: progress > 1.0 ? AppColors.systemOrange : color, // Orange if over goal
@@ -341,12 +347,10 @@ class _GoalsTabState extends State<GoalsTab> {
     );
   }
 
-  // Custom Cupertino-style Linear Progress Bar (if CupertinoProgressBar isn't found)
-  // This is a fallback if `CupertinoProgressBar` does not exist as a built-in widget.
-  // In a previous version, this was `_buildMacroBar` in scan_tab.dart
+  // Custom Cupertino-style Linear Progress Bar (as defined previously)
   Widget CupertinoProgressBar({required double value, required Color backgroundColor, required Color progressColor}) {
     return Container(
-      height: 6, // Or adjust as needed
+      height: 6,
       decoration: BoxDecoration(
         color: backgroundColor,
         borderRadius: BorderRadius.circular(3),

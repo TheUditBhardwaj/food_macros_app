@@ -37,8 +37,21 @@ class _ScanTabState extends State<ScanTab> with TickerProviderStateMixin {
   late Animation<double> _pulseAnimation;
 
   final ImagePicker _picker = ImagePicker();
-  static const String _backendApiUrl = 'http://10.0.2.2:8090/predict_macros/';
+  // static const String _backendApiUrl = 'http://10.0.2.2:8090/predict_macros/';
+  static const String _backendApiUrl = 'http://10.150.23.199:8090/predict_macros/';
 
+  static String getBackendUrl() {
+    if (Platform.isAndroid) {
+      // Android emulator special alias for host machine
+      return 'http://10.0.2.2:8090/predict_macros/';
+    } else if (Platform.isIOS) {
+      // iOS physical device or simulator
+      return 'http://localhost:8090/predict_macros/';
+    } else {
+      // macOS, Windows, Linux, or Web
+      return 'http://localhost:8090/predict_macros/';
+    }
+  }
   @override
   void initState() {
     super.initState();
@@ -86,7 +99,7 @@ class _ScanTabState extends State<ScanTab> with TickerProviderStateMixin {
     });
 
     try {
-      var request = http.MultipartRequest('POST', Uri.parse(_backendApiUrl));
+      var request = http.MultipartRequest('POST', Uri.parse(getBackendUrl()));
 
       String? mimeType = lookupMimeType(_image!.path);
       MediaType? mediaType;
@@ -217,7 +230,7 @@ class _ScanTabState extends State<ScanTab> with TickerProviderStateMixin {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'NutriScan',
+                          'Food Macros',
                           style: CupertinoTheme.of(context).textTheme.navLargeTitleTextStyle,
                         ),
                         const SizedBox(height: 4),
@@ -231,19 +244,19 @@ class _ScanTabState extends State<ScanTab> with TickerProviderStateMixin {
                       ],
                     ),
                   ),
-                  Container(
-                    width: 44,
-                    height: 44,
-                    decoration: BoxDecoration(
-                      color: AppColors.systemBlue.withOpacity(0.1), // Fixed: AppColors.systemBlue
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: const Icon(
-                      CupertinoIcons.sparkles,
-                      color: AppColors.systemBlue, // Fixed: AppColors.systemBlue
-                      size: 24,
-                    ),
-                  ),
+                  // Container(
+                  //   width: 44,
+                  //   height: 44,
+                  //   decoration: BoxDecoration(
+                  //     color: AppColors.systemBlue.withOpacity(0.1), // Fixed: AppColors.systemBlue
+                  //     borderRadius: BorderRadius.circular(12),
+                  //   ),
+                  //   child: const Icon(
+                  //     CupertinoIcons.sparkles,
+                  //     color: AppColors.systemBlue, // Fixed: AppColors.systemBlue
+                  //     size: 24,
+                  //   ),
+                  // ),
                 ],
               ),
 

@@ -90,7 +90,7 @@ class MyApp extends StatelessWidget {
     );
 
     return CupertinoApp(
-      title: 'NutriScan',
+      title: 'Food Macros',
       debugShowCheckedModeBanner: false,
       // Pass the selected theme data directly to the 'theme' parameter
       theme: isDark ? darkTheme : lightTheme,
