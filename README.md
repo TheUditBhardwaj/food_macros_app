@@ -84,9 +84,9 @@ You have two options to run the backend: directly or using Docker.
     ```
 4.  **Run the FastAPI application:**
     ```bash
-    uvicorn main:app --host 0.0.0.0 --port 8080
+    uvicorn main:app --host 0.0.0.0 --port 8090
     ```
-    The backend API will be available at `http://0.0.0.0:8080`.
+    The backend API will be available at `http://0.0.0.0:8090`.
 
 #### Option 2: Run Backend with Docker
 
@@ -100,9 +100,9 @@ You have two options to run the backend: directly or using Docker.
     ```
 3.  **Run the Docker container:**
     ```bash
-    docker run -p 8080:8080 food-macros-backend
+    docker run -p 8090:8090 food-macros-backend
     ```
-    The backend API will be available at `http://localhost:8080`.
+    The backend API will be available at `http://localhost:8090`.
 
 ### 🌐 Backend URL Configuration
 
@@ -113,13 +113,13 @@ The Flutter frontend needs to know where the backend is running. The `_backendAp
 static String getBackendUrl() {
   if (Platform.isAndroid) {
     // Android emulator special alias for host machine
-    return 'http://10.0.2.2:8080/predict_macros/'; // Changed to 8080
+    return 'http://10.0.2.2:8090/predict_macros/'; // Changed to 8090
   } else if (Platform.isIOS) {
     // iOS physical device or simulator
-    return 'http://localhost:8080/predict_macros/'; // Changed to 8080
+    return 'http://localhost:8090/predict_macros/'; // Changed to 8090
   } else {
     // macOS, Windows, Linux, or Web
-    return 'http://localhost:8080/predict_macros/'; // Changed to 8080
+    return 'http://localhost:8090/predict_macros/'; // Changed to 8090
   }
 }
 ```
