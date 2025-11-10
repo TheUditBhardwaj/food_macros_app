@@ -4,8 +4,11 @@ from typing import Dict
 import uvicorn
 import io
 import base64
+
 # Import actual model functions
 from model import preprocess_image, predict_macros
+import warnings
+warnings.filterwarnings("ignore", category=UserWarning, module='google.protobuf.runtime_version')
 
 app = FastAPI(
     title="Food Macros Finder API",
@@ -55,3 +58,6 @@ async def upload_image_for_prediction(file: UploadFile = File(...)):
 # To run the app (add this block if you want to run directly via python main.py)
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8090)
+    
+    
+    # uvicorn main:app --host 0.0.0.0 --port 8090

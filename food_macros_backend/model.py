@@ -11,7 +11,7 @@ model = tf.keras.models.load_model(model_path)
 
 # Load class labels
 def load_class_labels():
-    label_path = os.path.join(os.path.dirname(__file__), "class_names.txt")
+    label_path = os.path.join(os.path.dirname(__file__), "labels.txt")
     with open(label_path, "r") as f:
         return [line.strip() for line in f.readlines()]
 
